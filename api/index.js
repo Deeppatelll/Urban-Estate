@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors'; // Import CORS
 import UserRouter from './routes/user.route.js';
 import authRouter from './routes/auth.route.js';
+import listingRouter from './routes/listing.route.js';
 import cookieParser from 'cookie-parser';
 
 dotenv.config();
@@ -22,7 +23,7 @@ app.use(express.json());
 app.use(cookieParser());
 // CORS Configuration
 app.use(cors({
-    origin: 'http://localhost:3000', // Update this to match your frontend URL
+    origin: 'http://localhost:5173', // Update this to match your frontend URL
     methods: 'GET, POST, PUT, DELETE',
     credentials: true, // Allow cookies to be sent
 }));
@@ -30,7 +31,7 @@ app.use(cors({
 // Routes
 app.use('/api/user', UserRouter);
 app.use('/api/auth', authRouter);
-
+app.use('/api/listing',listingRouter)
 // Global Error Handler
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
