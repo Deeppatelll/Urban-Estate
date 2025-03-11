@@ -2,6 +2,7 @@ import bcryptjs from 'bcryptjs';
 import User from '../models/user.model.js';
 import { errorHandler } from '../utils/error.js';
 import Listing from '../models/listing.model.js';
+import { request } from 'express';
 
 
 export const test = (req, res) => {
@@ -72,3 +73,33 @@ export const getUser=async(req,res,next)=>{
     }
     
 }
+export const addtofavourites=async(req,res,next)=>{
+    try {
+        const listing=await Listing.findById(req.params.id);
+        console.log(listing);
+        const user = await User.findByIdAndUpdate(req.user.id, {
+            $push: {
+                favourites : req.params.id,
+            }
+        },{new:true})
+        res.status(200).json(user);
+    } catch (error) {
+        next(error);
+    }
+    
+}
+
+export const getFevs=async(req,res,next)=>{
+    try {
+        const user = await User.findById(req.params.id).populate('favourites');
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+        res.status(200).json({ success: true, favourites: user.favourites });
+    } catch (error) {
+        next(error);
+    }
+    
+}
+
+

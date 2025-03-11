@@ -8,7 +8,7 @@ import {
 import { app } from '../firebase';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-
+import { Link } from 'react-router-dom';
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -171,6 +171,12 @@ export default function CreateListing() {
   };
   return (
     <main className='p-3 max-w-4xl mx-auto'>
+       {/* 🔹 This section shows on small screens only */}
+       <div className="sm:hidden flex justify-between bg-gray-100 py-3 px-4 shadow-md">
+        <Link to="/" className="text-gray-700 font-medium">Home</Link>
+        <Link to="/about" className="text-gray-700 font-medium">About</Link>
+        <Link to="/profile" className="text-gray-700 font-medium">Profile</Link>
+      </div>
       <h1 className='text-3xl font-semibold text-center my-7'>
         Update a Listing
       </h1>

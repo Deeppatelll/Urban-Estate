@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ListingItem from '../components/ListingItem';
-
+import { Link } from 'react-router-dom';
 export default function Search() {
   const navigate = useNavigate();
   const [sidebardata, setSidebardata] = useState({
@@ -129,6 +129,12 @@ export default function Search() {
   };
   return (
     <div className='flex flex-col md:flex-row'>
+      {/* 🔹 This section shows on small screens only */}
+      <div className="sm:hidden flex justify-between bg-gray-100 py-3 px-4 shadow-md">
+        <Link to="/" className="text-gray-700 font-medium">Home</Link>
+        <Link to="/about" className="text-gray-700 font-medium">About</Link>
+        <Link to="/profile" className="text-gray-700 font-medium">Profile</Link>
+      </div>
       <div className='p-7  border-b-2 md:border-r-2 md:min-h-screen'>
         <form onSubmit={handleSubmit} className='flex flex-col gap-8'>
           <div className='flex items-center gap-2'>
