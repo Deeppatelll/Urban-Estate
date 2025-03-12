@@ -46,11 +46,35 @@ export default function Home() {
     <div>
 
       {/* 🔹 This section shows on small screens only */}
-      <div className="sm:hidden flex justify-between bg-gray-100 py-3 px-4 shadow-md">
-        <Link to="/profile" className="text-gray-700 font-medium">Profile</Link>
-        <Link to="/about" className="text-gray-700 font-medium">About</Link>
-        <Link to="/" className="text-gray-700 font-medium">Home</Link>
-      </div>
+       {/* 🔹 This section shows on small screens only */}
+       {/* 🔹 This section shows on small screens only */}
+<div className="sm:hidden flex justify-between bg-gray-100 py-3 px-4 shadow-md">
+  <Link 
+    to="/" 
+    className={`text-gray-700 font-medium pb-1 hover:text-blue-500 ${
+      location.pathname === "/" ? "border-b-2 border-blue-500 text-blue-600" : ""
+    }`}
+  >
+    Home
+  </Link>
+  <Link 
+    to="/about" 
+    className={`text-gray-700 font-medium pb-1 hover:text-blue-500 ${
+      location.pathname === "/about" ? "border-b-2 border-blue-500 text-blue-600" : ""
+    }`}
+  >
+    About
+  </Link>
+  <Link 
+    to="/profile" 
+    className={`text-gray-700 font-medium pb-1 hover:text-blue-500 ${
+      location.pathname === "/profile" ? "border-b-2 border-blue-500 text-blue-600" : ""
+    }`}
+  >
+    Profile
+  </Link>
+</div>
+
 
       {/* Hero Section with Background */}
       <div

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams,Link} from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore from 'swiper';
 import { useSelector } from 'react-redux';
@@ -26,6 +26,7 @@ export default function Listing() {
   const [contact, setContact] = useState(false);
   const params = useParams();
   const { currentUser } = useSelector((state) => state.user);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     let isMounted = true; // Prevent state updates on unmounted component
@@ -60,13 +61,19 @@ export default function Listing() {
     };
   }, [params.listingId]);
 
+  // Function to check if user is signed in
+  const checkAuth = () => {
+    if (!currentUser) {
+      navigate('/sign-in'); // Redirect to sign-in page
+      return false;
+    }
+    return true;
+  };
+
   const addToFavourites = async () => {
+    if (!checkAuth()) return; // Check if user is signed in
+
     try {
-      if (!currentUser) {
-        alert("You need to be logged in to add to favourites.");
-        return;
-      }
-  
       const res = await fetch(`/api/user/addtofav/${params.listingId}`, {
         method: "POST",
         headers: {
@@ -74,7 +81,7 @@ export default function Listing() {
           Authorization: `Bearer ${currentUser.token}`, // Ensure the token is sent
         },
       });
-  
+
       const data = await res.json();
       if (res.ok) {
         alert("Added to favourites successfully!");
@@ -86,10 +93,11 @@ export default function Listing() {
       alert("Something went wrong.");
     }
   };
-  
 
   // Function to generate PDF
   const generatePDF = async () => {
+    if (!checkAuth()) return; // Check if user is signed in
+
     const doc = new jsPDF();
     const imgWidth = 180;  // Width of the image in PDF
     const imgX = 10;  // X position for images
@@ -97,36 +105,26 @@ export default function Listing() {
 
     // Loop through images and add them to PDF
     for (const url of listing.imageUrls) {
-      // Create an image element
       const img = new Image();
       img.src = url;
 
-      // Wait for the image to load before adding to the PDF
       img.onload = function () {
-        // Calculate image height while maintaining the aspect ratio
         const aspectRatio = img.width / img.height;
         const imgHeight = imgWidth / aspectRatio;
 
-        // Add image to PDF with proper dimensions
         doc.addImage(url, 'JPEG', imgX, yPosition, imgWidth, imgHeight);
-        yPosition += imgHeight + 10;  // Add spacing after each image
+        yPosition += imgHeight + 10;
 
-        // After images, add details
-        if (yPosition >= 250) {  // Check if space is running out, add new page
+        if (yPosition >= 250) {
           doc.addPage();
-          yPosition = 10; // Reset Y position for the new page
+          yPosition = 10;
         }
 
-        // After the last image, add property details
         if (listing.imageUrls.indexOf(url) === listing.imageUrls.length - 1) {
-          // Add property details below images
-          yPosition += 10;  // Space between images and details
-
-          // Set font size and color for details
+          yPosition += 10;
           doc.setFontSize(10);
           doc.setTextColor(0, 0, 0);
 
-          // Add property details: Name, Price, Location, and Description
           doc.text(`Property Name: ${listing.name}`, imgX, yPosition);
           yPosition += 6;
 
@@ -139,7 +137,6 @@ export default function Listing() {
           doc.text(`Description: ${listing.description}`, imgX, yPosition);
           yPosition += 6;
 
-          // Save the PDF after details
           doc.save(`${listing.name}-brochure.pdf`);
         }
       };
@@ -148,8 +145,8 @@ export default function Listing() {
 
   return (
     <main>
-       {/* 🔹 This section shows on small screens only */}
-       <div className="sm:hidden flex justify-between bg-gray-100 py-3 px-4 shadow-md">
+      {/* 🔹 This section shows on small screens only */}
+      <div className="sm:hidden flex justify-between bg-gray-100 py-3 px-4 shadow-md">
         <Link to="/" className="text-gray-700 font-medium">Home</Link>
         <Link to="/about" className="text-gray-700 font-medium">About</Link>
         <Link to="/profile" className="text-gray-700 font-medium">Profile</Link>
@@ -209,8 +206,7 @@ export default function Listing() {
                   ₹{(+listing.regularPrice - +listing.discountPrice).toLocaleString('en-IN')} OFF
                 </p>
               )}
-  
-              {/* ✅ Moved "Add to Favourite" button to the yellow area without removing anything */}
+
               {currentUser && listing.userRef !== currentUser._id && (
                 <button
                   onClick={addToFavourites}
@@ -220,7 +216,7 @@ export default function Listing() {
                 </button>
               )}
             </div>
-  
+
             <p className="text-slate-800">
               <span className="font-semibold text-black">Description - </span>
               {listing.description}
@@ -247,32 +243,33 @@ export default function Listing() {
                 {listing.furnished ? 'Furnished' : 'Unfurnished'}
               </li>
             </ul>
-  
+
             {!contact && (
               <button
-                onClick={() => setContact(true)}
+                onClick={() => {
+                  if (checkAuth()) setContact(true); // Check if user is signed in
+                }}
                 className="bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3 mt-6"
               >
                 Contact Developer
               </button>
             )}
-  
+
             {contact && <Contact listing={listing} />}
-  
+
             {/* Download Brochure Button */}
             <button
-  onClick={generatePDF}
-  className="bg-blue-600 text-white rounded-lg uppercase hover:opacity-95 p-3 mt-6 flex justify-center items-center gap-2 w-full text-center"
->
-  <div className="flex items-center justify-center gap-2">
-    <FaDownload className="text-lg" />
-    <span>Download Brochure</span>
-  </div>
-</button>
-
+              onClick={generatePDF}
+              className="bg-blue-600 text-white rounded-lg uppercase hover:opacity-95 p-3 mt-6 flex justify-center items-center gap-2 w-full text-center"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <FaDownload className="text-lg" />
+                <span>Download Brochure</span>
+              </div>
+            </button>
           </div>
         </div>
       )}
     </main>
   );
-}  
+} 
