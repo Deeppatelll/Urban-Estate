@@ -92,5 +92,7 @@ npm run dev
 cd frontend
 npm start
 
+⭐ Support
 
+If you found this project useful, consider giving it a star!
 
